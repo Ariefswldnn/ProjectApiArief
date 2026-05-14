@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Pengguna {
+  id             Int             @id @default(autoincrement())
+  nama           String
+  username       String          @unique
+  password       String
+  peran          String          @default("KASIR") // KASIR atau ADMIN
+  transaksi      Transaksi[]
+  dibuatPada     DateTime        @default(now())
+  diperbaruiPada DateTime        @updatedAt
+}
+
+model Kategori {
+  id             Int       @id @default(autoincrement())
+  nama           String    @unique
+  produk         Produk[]
+  dibuatPada     DateTime  @default(now())
+  diperbaruiPada DateTime  @updatedAt
+}
+
+model Produk {
+  id               Int               @id @default(autoincrement())
+  nama             String
+  hargaJual        Int               // Harga jual ke pelanggan
+  gambar           String?           // URL atau path gambar produk
+  kategoriId       Int
+  kategori         Kategori          @relation(fields: [kategoriId], references: [id])
+  detailTransaksi  DetailTransaksi[]
+  dibuatPada       DateTime          @default(now())
+  diperbaruiPada   DateTime          @updatedAt
+}
+
+model Transaksi {
+  id               Int               @id @default(autoincrement())
+  namaPelanggan    String            @default("Umum") // Nama pelanggan untuk memanggil pesanan
+  totalBelanja     Int
+  metodePembayaran String            @default("TUNAI") // TUNAI, DEBIT, QRIS
+  penggunaId       Int
+  pengguna         Pengguna          @relation(fields: [penggunaId], references: [id])
+  detail           DetailTransaksi[]
+  dibuatPada       DateTime          @default(now())
+}
+
+model DetailTransaksi {
+  id                      Int       @id @default(autoincrement())
+  transaksiId             Int
+  transaksi               Transaksi @relation(fields: [transaksiId], references: [id])
+  produkId                Int
+  produk                  Produk    @relation(fields: [produkId], references: [id])
+  jumlah                  Int
+  hargaJualSaatTransaksi  Int       // Harga Jual saat pesanan dibuat (mencegah perubahan harga lama jika harga menu naik)
+}
