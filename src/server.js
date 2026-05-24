@@ -4,10 +4,6 @@ const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const statisticsRoutes = require('./routes/statistics');
-
-app.use('/api/statistics', statisticsRoutes);
-
 // Middleware dasar
 app.use(cors()); // Mengizinkan request dari frontend
 app.use(express.json()); // Agar Express bisa membaca request body berformat JSON
@@ -21,11 +17,13 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const masterRoutes = require('./routes/masterRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const statisticsRoutes = require('./routes/statistics');
 
 // Rute-rute (Routes) API
 app.use('/api/auth', authRoutes);
 app.use('/api', masterRoutes); // ini akan menangani /api/categories dan /api/products
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/statistics', statisticsRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
