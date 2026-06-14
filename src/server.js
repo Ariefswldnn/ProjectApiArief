@@ -25,10 +25,8 @@ app.use('/api', masterRoutes); // ini akan menangani /api/categories dan /api/pr
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/statistics', statisticsRoutes);
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`🚀 Server berjalan di port ${PORT}`);
+});
 
 module.exports = app;

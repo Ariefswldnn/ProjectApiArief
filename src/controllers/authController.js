@@ -18,8 +18,30 @@ const authController = {
         return res.status(404).json({ message: 'Username tidak ditemukan!' });
       }
 
-      // Cek apakah password cocok
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      // Cek apakah password cocok (mendukung plain-text untuk data seed lama)
+      let isPasswordValid = false;
+      const isBcrypt = user.password.startsWith('$2b$') || user.password.startsWith('$2a$');
+
+      if (isBcrypt) {
+        isPasswordValid = await bcrypt.compare(password, user.password);
+      } else {
+        isPasswordValid = (password === user.password);
+        // Migrasi otomatis ke bcrypt jika password plain-text cocok
+        if (isPasswordValid) {
+          try {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            await prisma.pengguna.update({
+              where: { id: user.id },
+              data: { password: hashedPassword }
+            });
+            console.log(`Password pengguna ${user.username} berhasil di-upgrade ke bcrypt.`);
+          } catch (upgradeError) {
+            console.error('Gagal meng-upgrade password:', upgradeError);
+          }
+        }
+      }
+
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Password salah!' });
       }
