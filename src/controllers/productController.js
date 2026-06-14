@@ -13,31 +13,42 @@ const productController = {
     }
   },
 
+  // MENAMBAH PRODUK (Sudah diperbaiki untuk mendukung upload gambar)
   createProduct: async (req, res) => {
     try {
       const { nama, hargaJual, kategoriId } = req.body;
-      
+
+      // Buat objek data dasar
+      const data = {
+        nama,
+        hargaJual: parseInt(hargaJual),
+        kategoriId: parseInt(kategoriId),
+      };
+
+      // PERBAIKAN: Cek apakah ada file gambar yang diunggah saat pembuatan produk
+      if (req.file) {
+        data.gambar = `/uploads/${req.file.filename}`;
+      }
+
       const newProduct = await prisma.produk.create({
-        data: { 
-          nama, 
-          hargaJual: parseInt(hargaJual), 
-          kategoriId: parseInt(kategoriId),
-        }
+        data: data
       });
+
       res.status(201).json({ message: 'Produk berhasil ditambahkan', data: newProduct });
     } catch (error) {
       res.status(500).json({ message: 'Gagal menambah produk', error: error.message });
     }
   },
 
+  // UPDATE PRODUK
   updateProduct: async (req, res) => {
     try {
       const { id } = req.params;
       const { nama, hargaJual, kategoriId } = req.body;
-      const data = { 
-        nama, 
-        hargaJual: parseInt(hargaJual), 
-        kategoriId: parseInt(kategoriId) 
+      const data = {
+        nama,
+        hargaJual: parseInt(hargaJual),
+        kategoriId: parseInt(kategoriId)
       };
 
       if (req.file) {
@@ -54,6 +65,7 @@ const productController = {
     }
   },
 
+  // HAPUS PRODUK
   deleteProduct: async (req, res) => {
     try {
       const { id } = req.params;
