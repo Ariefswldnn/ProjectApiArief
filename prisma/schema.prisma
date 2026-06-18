@@ -57,3 +57,12 @@ model DetailTransaksi {
   jumlah                  Int
   hargaJualSaatTransaksi  Int       // Harga Jual saat pesanan dibuat (mencegah perubahan harga lama jika harga menu naik)
 }
+
+model Absensi {
+  id             Int      @id @default(autoincrement())
+  namaKaryawan   String
+  fotoSelfie     String   // Path to stored selfie image
+  waktuAbsen     DateTime @default(now())
+  tipeAbsen      String   @default("MASUK") // MASUK atau PULANG
+  shift          String   @default("SHIFT_1") // SHIFT_1 atau SHIFT_2
+}
